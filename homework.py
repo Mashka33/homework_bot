@@ -34,6 +34,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 def send_message(bot, message):
     """Отправляем сообщение в телеграмм бот."""
     try:
@@ -44,6 +45,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
+    """делает запрос к единственному эндпоинту API-сервиса"""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -64,7 +66,9 @@ def get_api_answer(current_timestamp):
         logger.error('Ошибка парсинга ответа из формата json')
         raise ValueError('Ошибка парсинга ответа из формата json')
 
+
 def check_response(response):
+    """проверяет ответ API на корректность."""
     if type(response) is not dict:
         raise TypeError('Ответ API отличен от словаря')
     try:
@@ -81,26 +85,26 @@ def check_response(response):
  
 
 def parse_status(homework):
-   """ извлекает из информации о конкретной домашней 
-   работе статус этой работы"""
-   if 'homework_name' in homework:
+    """извлекает из информации о конкретной домашней работе статус этой работы."""
+    if 'homework_name' in homework:
         homework_name = homework.get('homework_name')
-   else:
+    else:
         msg = 'API вернул домашнее задание без ключа "homework_name" key'
         raise KeyError(msg)
-   homework_status = homework.get('status')
-   try:
+    homework_status = homework.get('status')
+    try:
         verdict = HOMEWORK_STATUSES[homework_status]
-   except KeyError:
+    except KeyError:
         msg = ('API вернулось'
                f'неизвестный статус {homework_status} for "{homework_name}"'
                )
         raise APIErrException(msg)
 
-   return f'Изменился статус проверки работы "{homework_name}". {verdict}'
+    return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
 def check_tokens():
+    """проверяет доступность переменных окружения."""
     return all(
         [
             TELEGRAM_TOKEN,
@@ -109,6 +113,7 @@ def check_tokens():
         ]
     )
 
+
 def main():
     """Основная логика работы бота."""
     if not check_tokens():
@@ -116,6 +121,8 @@ def main():
         return 0
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
+    STATUS = ''
+    ERROR_CACHE_MESSAGE = ''
 
     while True:
         try:
