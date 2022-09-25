@@ -45,7 +45,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(current_timestamp):
-    """делает запрос к единственному эндпоинту API-сервиса"""
+    """Делает запрос к единственному эндпоинту API-сервиса."""
     timestamp = current_timestamp or int(time.time())
     params = {'from_date': timestamp}
     try:
@@ -82,10 +82,12 @@ def check_response(response):
         logger.error('Список домашних работ пуст')
         raise IndexError('Список домашних работ пуст')
     return homework
- 
+
 
 def parse_status(homework):
-    """извлекает из информации о конкретной домашней работе статус этой работы."""
+    """
+    извлекает из информации о конкретной домашней работе статус этой работы.
+    """
     if 'homework_name' in homework:
         homework_name = homework.get('homework_name')
     else:
