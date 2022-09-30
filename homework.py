@@ -78,8 +78,9 @@ def get_api_answer(current_timestamp):
                 f'Текст ошибки: {response.text}')
         return response.json()
     except Exception as error:
-        raise ConnectionError(f"Ошибка при запросе к основному API: {error}"
-               f" {'url'} {'headers'} {'params'}".format(error, **query_dict))
+        raise ConnectionError(
+            f"Ошибка при запросе к основному API: {error}"
+            f" {'url'} {'headers'} {'params'}".format(error, **query_dict))
 
 
 def check_response(response):
