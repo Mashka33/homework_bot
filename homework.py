@@ -72,13 +72,13 @@ def get_api_answer(current_timestamp):
                     f"{'params'}".format(**query_dict))
         response = requests.get(**query_dict)
         if response.status_code != HTTPStatus.OK:
-            raise HTTPStatusError(f'Код ответа API не 200 {response.status_code}'
-                                  f'{response.reason} {response.text}')
+            raise HTTPStatusError(
+                f'Код ответа API не 200 {response.status_code}'
+                f'{response.reason} {response.text}')
         return response.json()
     except ConnectionError as error:
         raise (f"Ошибка при запросе к основному API: {error} {'url'}"
                f"{'headers'} {'params'}".format(error, **query_dict))
-    
 
 
 def check_response(response):
@@ -109,6 +109,7 @@ def parse_status(homework):
     return (
         f'Изменился статус проверки работы "{homework_name}".'
         f'{HOMEWORK_VERDICTS[homework_status]}') 
+
 
 def check_tokens():
     """проверяет доступность переменных окружения."""
@@ -165,9 +166,9 @@ def main():
 
         except Exception as error:
             logging.error(error)
-            current_report['message'] = f'Сбой в работе программы. Ошибка: {error}'
+            current_report['message'] = f'Произошёл сбой. Ошибка: {error}'
             if current_report != prev_report:
-                send_message(bot, f'Сбой в работе программы. Ошибка: {error}')
+                send_message(bot, f'Произошёл сбой. Ошибка: {error}')
                 prev_report = current_report.copy()
         finally:
             time.sleep(RETRY_TIME)
