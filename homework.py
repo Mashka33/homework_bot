@@ -35,9 +35,9 @@ stream_handler = logging.StreamHandler()
 
 logging.basicConfig(
     format=('%(asctime)s, %(levelname)s, %(name)s,'
-           '%(filename)s, %(funcName)s, %(lineno)d, %(message)s'),
+            '%(filename)s, %(funcName)s, %(lineno)d, %(message)s'),
     level=logging.INFO,
-    handlers = [file_handler, stream_handler]
+    handlers=[file_handler, stream_handler]
 )
 
 
@@ -69,12 +69,13 @@ def get_api_answer(current_timestamp):
     }
     try:
         logging.info(f"Проверка запроса к API: {'url'} {'headers'}"
-                    f"{'params'}".format(**query_dict))
+                     f"{'params'}".format(**query_dict))
         response = requests.get(**query_dict)
         if response.status_code != HTTPStatus.OK:
             raise HTTPStatusError(
-                f'Код ответа API не 200 {response.status_code}'
-                f'{response.reason} {response.text}')
+                f'Код ответа API: {response.status_code}'
+                f'Причина: {response.reason}'
+                f'Текст ошибки: {response.text}')
         return response.json()
     except ConnectionError as error:
         raise (f"Ошибка при запросе к основному API: {error} {'url'}"
@@ -94,21 +95,21 @@ def check_response(response):
     return homeworks
 
 
-def parse_status(homework): 
-    """Gets the status of a particular homework.""" 
+def parse_status(homework):
+    """Gets the status of a particular homework."""
     logging.info('Getting the status of a homework')
     if 'homework_name' not in homework:
         raise KeyError(
             'API вернул домашнее задание без ключа "homework_name" key')
-    homework_name = homework.get('homework_name') 
+    homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
     if homework_status not in HOMEWORK_VERDICTS:
         raise ValueError(f'Unknown status')
-    if HOMEWORK_VERDICTS[homework_status] is None: 
-        raise KeyError('Unknown status') 
+    if HOMEWORK_VERDICTS[homework_status] is None:
+        raise KeyError('Unknown status')
     return (
         f'Изменился статус проверки работы "{homework_name}".'
-        f'{HOMEWORK_VERDICTS[homework_status]}') 
+        f'{HOMEWORK_VERDICTS[homework_status]}')
 
 
 def check_tokens():
@@ -160,7 +161,7 @@ def main():
                     )
                 else:
                     logging.info('Новых статусов нет')
-                
+
         except EmptyAPIResponse as error:
             logging.info(f'Пустой ответ API. Ошибка: {error}')
 
