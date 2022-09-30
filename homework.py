@@ -30,7 +30,7 @@ HOMEWORK_VERDICTS = {
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, 'telegram_bot.log')
 
-file_handler = logging.FileHandler(LOG_FILE, mode='a', encoding=None)
+file_handler = logging.FileHandler(LOG_FILE, mode='a', encoding='utf-8')
 stream_handler = logging.StreamHandler()
 
 logging.basicConfig(
@@ -77,9 +77,9 @@ def get_api_answer(current_timestamp):
                 f'Причина: {response.reason}'
                 f'Текст ошибки: {response.text}')
         return response.json()
-    except ConnectionError as error:
-        raise (f"Ошибка при запросе к основному API: {error} {'url'}"
-               f"{'headers'} {'params'}".format(error, **query_dict))
+    except Exception as error:
+        raise ConnectionError(f"Ошибка при запросе к основному API: {error}"
+               f" {'url'} {'headers'} {'params'}".format(error, **query_dict))
 
 
 def check_response(response):
@@ -105,8 +105,6 @@ def parse_status(homework):
     homework_status = homework.get('status')
     if homework_status not in HOMEWORK_VERDICTS:
         raise ValueError('Unknown status')
-    if HOMEWORK_VERDICTS[homework_status] is None:
-        raise KeyError('Unknown status')
     return (
         f'Изменился статус проверки работы "{homework_name}".'
         f'{HOMEWORK_VERDICTS[homework_status]}')
@@ -125,8 +123,7 @@ def check_tokens():
     tokens_bool = True
     for tokens_name, tokens in tokens_check:
         if not tokens:
-            logging.critical(
-                f'{no_tokens_msg} {tokens_name}')
+            logging.critical(no_tokens_msg, tokens_name)
             tokens_bool = False
     return tokens_bool
 
@@ -136,9 +133,9 @@ def main():
     if not check_tokens():
         logging.critical('Отсутствует переменная окружения'
                          'Программа принудительно остановлена')
-        raise KeyError('Ошибка в ')
+        raise KeyError('Ошибка в Токене')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
-    current_timestamp = int(time.time())
+    current_timestamp = 0
     prev_report = {}
     current_report = {}
 
@@ -159,8 +156,8 @@ def main():
                         "current_date",
                         current_timestamp
                     )
-                else:
-                    logging.info('Новых статусов нет')
+            else:
+                logging.info('Новых статусов нет')
 
         except EmptyAPIResponse as error:
             logging.info(f'Пустой ответ API. Ошибка: {error}')
@@ -169,7 +166,7 @@ def main():
             logging.error(error)
             current_report['message'] = f'Произошёл сбой. Ошибка: {error}'
             if current_report != prev_report:
-                send_message(bot, f'Произошёл сбой. Ошибка: {error}')
+                send_message(bot, current_report['message'])
                 prev_report = current_report.copy()
         finally:
             time.sleep(RETRY_TIME)
