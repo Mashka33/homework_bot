@@ -104,7 +104,7 @@ def parse_status(homework):
     homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
     if homework_status not in HOMEWORK_VERDICTS:
-        raise ValueError(f'Unknown status')
+        raise ValueError('Unknown status')
     if HOMEWORK_VERDICTS[homework_status] is None:
         raise KeyError('Unknown status')
     return (
