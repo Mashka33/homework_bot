@@ -79,8 +79,8 @@ def get_api_answer(current_timestamp):
         return response.json()
     except Exception as error:
         raise ConnectionError(
-            f"Ошибка при запросе к основному API: {error}"
-            f" {'url'} {'headers'} {'params'}".format(error, **query_dict))
+            f"Ошибка при запросе к основному API: {error} {'url'}"
+            f"{'headers'} {'params'}".format(error, **query_dict))
 
 
 def check_response(response):
@@ -115,7 +115,7 @@ def check_tokens():
     """проверяет доступность переменных окружения."""
     no_tokens_msg = (
         'Программа принудительно остановлена. '
-        'Отсутствует обязательная переменная окружения:')
+        'Отсутствует обязательная переменная окружения:{}')
     tokens_check = (
         ('TELEGRAM_TOKEN', TELEGRAM_TOKEN),
         ('PRACTICUM_TOKEN', PRACTICUM_TOKEN),
@@ -124,7 +124,7 @@ def check_tokens():
     tokens_bool = True
     for tokens_name, tokens in tokens_check:
         if not tokens:
-            logging.critical(no_tokens_msg, tokens_name)
+            logging.critical(no_tokens_msg.format(tokens_name))
             tokens_bool = False
     return tokens_bool
 
@@ -134,7 +134,7 @@ def main():
     if not check_tokens():
         logging.critical('Отсутствует переменная окружения'
                          'Программа принудительно остановлена')
-        raise KeyError('Ошибка в Токене')
+        raise KeyError('Ошибка в Токне')
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = 0
     prev_report = {}
